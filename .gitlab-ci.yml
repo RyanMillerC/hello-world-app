@@ -3,5 +3,5 @@ default:
 
 s2i:
   script:
-    - oc login https://api.ocp.taco.moe:6443 --token="${OPENSHIFT_API_TOKEN}"
+    - oc login https://api.ocp.taco.moe:6443 --token="${OPENSHIFT_API_TOKEN}" --skip-insecure-tls-verify
     - oc get buildconfigs
