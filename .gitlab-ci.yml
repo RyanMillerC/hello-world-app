@@ -1,0 +1,7 @@
+stages:
+  - build
+
+build-image:
+  stage: build
+  script:
+    - echo 'I am building!'
