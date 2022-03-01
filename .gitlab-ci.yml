@@ -1,7 +1,6 @@
-stages:
-  - build
+default:
+  image: registry.redhat.io/openshift4/ose-cli:latest
 
-build-image:
-  stage: build
+s2i:
   script:
-    - echo 'I am building!'
+    - oc get buildconfigs
