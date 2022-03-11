@@ -3,10 +3,11 @@
 ## Deploy using S2I
 
 ```bash
-$ oc new-project rest-http-example
-$ oc new-app java~https://git.taco.moe/lab/rest-http-example
+$ oc new-project hello-world
+$ oc new-app java~https://git.taco.moe/lab/hello-world-spring-boot.git
 $ watch -d oc get builds
 # Wait for build to complete
-$ oc expose svc/rest-http-example
-$ curl http://rest-http-example-rest-http-example.apps.ocp.taco.moe/api/greeting
+$ oc expose svc/hello-world
+$ oc get routes
+# curl the exposed route
 ```
