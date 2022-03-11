@@ -1,4 +1,4 @@
-# REST HTTP Spring Boot Example
+# Hello World (Spring Boot)
 
 ## Deploy using S2I
 
