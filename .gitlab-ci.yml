@@ -3,4 +3,4 @@ default:
 
 build:
   script:
-    - oc start-build hello-world --follow --wait
+    - oc start-build hello-world -n hello-world --follow --wait
