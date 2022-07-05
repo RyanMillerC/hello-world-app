@@ -3,4 +3,6 @@ default:
 
 build:
   script:
-    - oc start-build hello-world -n hello-world --follow --wait
+    - oc get builds
+    - oc logs build hello-world-3
+    - oc start-build hello-world -n hello-world
