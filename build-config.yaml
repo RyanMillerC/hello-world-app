@@ -1,17 +1,10 @@
 apiVersion: build.openshift.io/v1
 kind: BuildConfig
 metadata:
-  annotations:
-    openshift.io/generated-by: OpenShiftNewApp
-  labels:
-    app: hello-world-spring-boot
-    app.kubernetes.io/component: hello-world-spring-boot
-    app.kubernetes.io/instance: hello-world-spring-boot
-  name: hello-world-spring-boot
+  name: hello-world
   namespace: hello-world
 spec:
   failedBuildsHistoryLimit: 5
-  nodeSelector: null
   output:
     pushSecret:
       name: push-secret # This needs to be created
