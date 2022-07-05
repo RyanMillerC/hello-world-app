@@ -3,6 +3,6 @@ default:
 
 build:
   script:
-    - oc get builds
-    - oc logs hello-world-3-build
+    - oc get builds -n hello-world
+    - oc logs hello-world-3-build -n hello-world
     - oc start-build hello-world -n hello-world
