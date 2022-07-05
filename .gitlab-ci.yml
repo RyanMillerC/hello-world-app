@@ -4,5 +4,5 @@ default:
 build:
   script:
     - oc get builds
-    - oc logs build hello-world-3
+    - oc logs hello-world-3-build
     - oc start-build hello-world -n hello-world
