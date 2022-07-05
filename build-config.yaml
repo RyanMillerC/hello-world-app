@@ -1,0 +1,40 @@
+apiVersion: build.openshift.io/v1
+kind: BuildConfig
+metadata:
+  annotations:
+    openshift.io/generated-by: OpenShiftNewApp
+  labels:
+    app: hello-world-spring-boot
+    app.kubernetes.io/component: hello-world-spring-boot
+    app.kubernetes.io/instance: hello-world-spring-boot
+  name: hello-world-spring-boot
+  namespace: hello-world
+spec:
+  failedBuildsHistoryLimit: 5
+  nodeSelector: null
+  output:
+    to:
+      kind: ImageStreamTag
+      name: hello-world-spring-boot:latest
+  runPolicy: Serial
+  source:
+    git:
+      uri: https://git.taco.moe/lab/hello-world-spring-boot.git
+    type: Git
+  strategy:
+    sourceStrategy:
+      from:
+        kind: ImageStreamTag
+        name: java:openjdk-17-ubi8
+        namespace: openshift
+    type: Source
+  successfulBuildsHistoryLimit: 5
+  triggers:
+  - github:
+      secret: ZzSAP__BE3UpCeLXAONI
+    type: GitHub
+  - generic:
+      secret: FRkkkXfV6ZAXjzDMix1w
+    type: Generic
+  - type: ConfigChange
+  - type: ImageChange
