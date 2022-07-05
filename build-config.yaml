@@ -13,9 +13,11 @@ spec:
   failedBuildsHistoryLimit: 5
   nodeSelector: null
   output:
+    pushSecret:
+      name: push-secret # This needs to be created
     to:
-      kind: ImageStreamTag
-      name: hello-world-spring-boot:latest
+      kind: DockerImage
+      name: quay-registry-quay-quay-enterprise.apps.hub.taco.moe/hello-world/hello-world:latest
   runPolicy: Serial
   source:
     git:
