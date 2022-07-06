@@ -3,5 +3,6 @@ default:
 
 build:
   script:
+    - sleep 5000
     - oc logs hello-world-build-3 -n hello-world --follow
     - oc start-build hello-world -n hello-world --wait --follow
