@@ -45,15 +45,36 @@ build-image:
 
 build-release-image:
   script:
-    - oc whoami
     - |
-      oc new-build \
-        "java~https://gitlab.taco.moe/hello-world/hello-world-spring-boot.git#$CI_COMMIT_SHORT_SHA" \
-        --name "release-$CI_COMMIT_SHORT_SHA" \
-        --push-secret push-secret \
-        --to "quay-registry-quay-quay-enterprise.apps.hub.taco.moe/hello-world/hello-world:$CI_COMMIT_SHORT_SHA" \
-        --to-docker \
-        --follow \
-        --wait
+      oc get buildconfig release-$CI_COMMIT_SHORT_SHA &> /dev/null || oc create -f - << EOF
+        apiVersion: build.openshift.io/v1
+        kind: BuildConfig
+        metadata:
+          name: release-$CI_COMMIT_SHORT_SHA
+          namespace: gitlab-runner
+        spec:
+          failedBuildsHistoryLimit: 5
+          output:
+            pushSecret:
+              name: push-secret # This needs to be created
+            to:
+              kind: DockerImage
+              name: "${IMAGE_NAME}:${CI_COMMIT_SHORT_SHA}"
+          runPolicy: Serial
+          source:
+            git:
+              ref: $CI_COMMIT_BRANCH
+              uri: "${CI_PROJECT_URL}.git"
+            type: Git
+          strategy:
+            sourceStrategy:
+              from:
+                kind: ImageStreamTag
+                name: java:openjdk-17-ubi8
+                namespace: openshift
+            type: Source
+          successfulBuildsHistoryLimit: 5
+      EOF
+    - oc start-build "release-$CI_COMMIT_SHORT_SHA" --follow --wait
   only:
     - main
