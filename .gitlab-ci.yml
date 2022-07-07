@@ -3,7 +3,7 @@ default:
 
 build:
   script:
-    - oc start-build "hello-world-${CI_COMMIT_BRANCH}" \
+    - oc start-build "hello-world-$CI_COMMIT_BRANCH" \
         --namespace hello-world-dev \
         --follow \
         --wait
