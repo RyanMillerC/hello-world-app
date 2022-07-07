@@ -8,7 +8,7 @@ variables:
 build-image:
   script:
     - |
-      cat << EOF
+      oc get buildconfig $CI_COMMIT_BRANCH || cat << EOF
         apiVersion: build.openshift.io/v1
         kind: BuildConfig
         metadata:
@@ -21,12 +21,12 @@ build-image:
               name: push-secret # This needs to be created
             to:
               kind: DockerImage
-              name: $IMAGE_NAME
+              name: "${IMAGE_NAME}:${CI_COMMIT_BRANCH}"
           runPolicy: Serial
           source:
             git:
               ref: $CI_COMMIT_BRANCH
-              uri: ${CI_PROJECT_URL}.git
+              uri: "${CI_PROJECT_URL}.git"
             type: Git
           strategy:
             sourceStrategy:
