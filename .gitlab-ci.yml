@@ -8,7 +8,7 @@ variables:
 build-image:
   script:
     - |
-      oc get buildconfig $CI_COMMIT_BRANCH || cat << EOF
+      oc get buildconfig $CI_COMMIT_BRANCH &> /dev/null || cat << EOF
         apiVersion: build.openshift.io/v1
         kind: BuildConfig
         metadata:
@@ -37,12 +37,7 @@ build-image:
             type: Source
           successfulBuildsHistoryLimit: 5
       EOF
-    - exit 0
-    - |
-      oc start-build "$CI_COMMIT_BRANCH" \
-        --namespace hello-world-dev \
-        --follow \
-        --wait
+    - oc start-build "$CI_COMMIT_BRANCH" --follow --wait
   only:
     - dev
     - test1
