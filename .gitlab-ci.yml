@@ -8,7 +8,7 @@ variables:
 build-image:
   script:
     - |
-      oc get buildconfig $CI_COMMIT_BRANCH &> /dev/null || cat << EOF
+      oc get buildconfig $CI_COMMIT_BRANCH &> /dev/null || oc create -f - << EOF
         apiVersion: build.openshift.io/v1
         kind: BuildConfig
         metadata:
