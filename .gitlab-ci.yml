@@ -15,6 +15,7 @@ build-image:
 
 build-release-image:
   script:
+    - oc whoami
     - |
       oc new-build \
         "java~https://gitlab.taco.moe/hello-world/hello-world-spring-boot.git#$CI_COMMIT_SHORT_SHA" \
