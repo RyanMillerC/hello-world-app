@@ -3,8 +3,12 @@ default:
 
 build:
   script:
-    # - sleep 5000
-    # - oc logs hello-world-build-3 -n hello-world --follow
-    - env
-    - exit 1
-    - oc start-build hello-world -n hello-world --wait --follow
+    - oc start-build "hello-world-${CI_COMMIT_BRANCH}" \
+        --namespace hello-world \
+        --follow \
+        --wait
+  only:
+    - dev
+    - test1
+    - test2
+    - main
