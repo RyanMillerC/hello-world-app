@@ -1,7 +1,7 @@
 default:
   image: registry.redhat.io/openshift4/ose-cli:latest
 
-build:
+build-image:
   script:
     - |
       oc start-build "$CI_COMMIT_BRANCH" \
@@ -12,4 +12,15 @@ build:
     - dev
     - test1
     - test2
+
+build-release-image:
+  script:
+    - |
+      oc new-build \
+        "java~https://gitlab.taco.moe/hello-world/hello-world-spring-boot.git#$CI_COMMIT_SHORT_SHA" \
+        --name "release-$CI_COMMIT_SHORT_SHA" \
+        --push-secret push-secret \
+        --to "quay-registry-quay-quay-enterprise.apps.hub.taco.moe/hello-world/hello-world:$CI_COMMIT_SHORT_SHA" \
+        --to-docker
+  only:
     - main
