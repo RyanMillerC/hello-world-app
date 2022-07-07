@@ -51,7 +51,7 @@ build-release-image:
         apiVersion: build.openshift.io/v1
         kind: BuildConfig
         metadata:
-          name: release-$CI_COMMIT_SHORT_SHA
+          name: "${APP_NAME}-${CI_COMMIT_SHORT_SHA}"
           namespace: gitlab-runner
         spec:
           failedBuildsHistoryLimit: 5
