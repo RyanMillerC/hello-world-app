@@ -2,6 +2,7 @@ default:
   image: registry.redhat.io/openshift4/ose-cli:latest
 
 variables:
+  APP_NAME: hello-world
   # IMAGE_NAME should not have a tag at the end! That will be detemined based on branch
   IMAGE_NAME: quay-registry-quay-quay-enterprise.apps.hub.taco.moe/hello-world/hello-world
 
@@ -12,7 +13,7 @@ build-image:
         apiVersion: build.openshift.io/v1
         kind: BuildConfig
         metadata:
-          name: $CI_COMMIT_BRANCH
+          name: "${APP_NAME}-${CI_COMMIT_BRANCH}"
           namespace: gitlab-runner
         spec:
           failedBuildsHistoryLimit: 5
@@ -37,7 +38,7 @@ build-image:
             type: Source
           successfulBuildsHistoryLimit: 5
       EOF
-    - oc start-build "$CI_COMMIT_BRANCH" --follow --wait
+    - oc start-build "${APP_NAME}-${CI_COMMIT_BRANCH}" --follow --wait
   only:
     - dev
     - test1
@@ -46,7 +47,7 @@ build-image:
 build-release-image:
   script:
     - |
-      oc get buildconfig release-$CI_COMMIT_SHORT_SHA &> /dev/null || oc create -f - << EOF
+      oc get buildconfig "${APP_NAME}-${CI_COMMIT_SHORT_SHA}" &> /dev/null || oc create -f - << EOF
         apiVersion: build.openshift.io/v1
         kind: BuildConfig
         metadata:
@@ -75,6 +76,6 @@ build-release-image:
             type: Source
           successfulBuildsHistoryLimit: 5
       EOF
-    - oc start-build "release-$CI_COMMIT_SHORT_SHA" --follow --wait
+    - oc start-build "${APP_NAME}-${CI_COMMIT_SHORT_SHA}" --follow --wait
   only:
     - main
