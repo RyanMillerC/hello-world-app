@@ -22,6 +22,8 @@ build-release-image:
         --name "release-$CI_COMMIT_SHORT_SHA" \
         --push-secret push-secret \
         --to "quay-registry-quay-quay-enterprise.apps.hub.taco.moe/hello-world/hello-world:$CI_COMMIT_SHORT_SHA" \
-        --to-docker
+        --to-docker \
+        --follow \
+        --wait
   only:
     - main
