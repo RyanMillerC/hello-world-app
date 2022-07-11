@@ -1,5 +1,5 @@
 default:
-  image: registry.redhat.io/openshift4/ose-cli:latest
+  image: quay-registry-quay-quay-enterprise.apps.hub.taco.moe/hello-world/ci-tools:latest
 
 variables:
   APP_NAME: hello-world
