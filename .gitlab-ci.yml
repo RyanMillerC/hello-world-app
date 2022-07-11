@@ -41,7 +41,7 @@ build-image:
       EOF
     - oc start-build "${APP_NAME}-${CI_COMMIT_BRANCH}" --follow --wait
     - roxctl -e "$ROX_CENTRAL_ADDRESS" image scan --image "${IMAGE_NAME}:${CI_COMMIT_BRANCH}" --insecure-skip-tls-verify --output json > scan.json
-    - jq -r '.results.summary' scan.json
+    - jq -r '.result.summary' scan.json
   only:
     - dev
     - test1
@@ -80,7 +80,7 @@ build-release-image:
           successfulBuildsHistoryLimit: 5
       EOF
     - oc start-build "${APP_NAME}-${CI_COMMIT_SHORT_SHA}" --follow --wait
-    - roxctl -e "$ROX_CENTRAL_ADDRESS" image scan --image quay-registry-quay-quay-enterprise.apps.hub.taco.moe/hello-world/hello-world:64c70dca --insecure-skip-tls-verify --output json > scan.json
-    - jq -r '.results.summary' scan.json
+    - roxctl -e "$ROX_CENTRAL_ADDRESS" image scan --image "${IMAGE_NAME}:${CI_COMMIT_SHORT_SHA}" --insecure-skip-tls-verify --output json > scan.json
+    - jq -r '.result.summary' scan.json
   only:
     - main
