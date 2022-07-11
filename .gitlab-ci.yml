@@ -5,6 +5,7 @@ variables:
   APP_NAME: hello-world
   # IMAGE_NAME should not have a tag at the end! That will be detemined based on branch
   IMAGE_NAME: quay-registry-quay-quay-enterprise.apps.hub.taco.moe/hello-world/hello-world
+  ROX_CENTRAL_ADDRESS: central-stackrox.apps.hub.taco.moe:443
 
 build-image:
   script:
@@ -39,6 +40,7 @@ build-image:
           successfulBuildsHistoryLimit: 5
       EOF
     - oc start-build "${APP_NAME}-${CI_COMMIT_BRANCH}" --follow --wait
+    - roxctl
   only:
     - dev
     - test1
@@ -77,5 +79,7 @@ build-release-image:
           successfulBuildsHistoryLimit: 5
       EOF
     - oc start-build "${APP_NAME}-${CI_COMMIT_SHORT_SHA}" --follow --wait
+    - roxctl -e "$ROX_CENTRAL_ADDRESS" image scan --image quay-registry-quay-quay-enterprise.apps.hub.taco.moe/hello-world/hello-world:64c70dca --insecure-skip-tls-verify --output json > scan.json
+    - jq -r '.results.summary' scan.json
   only:
     - main
