@@ -40,7 +40,8 @@ build-image:
           successfulBuildsHistoryLimit: 5
       EOF
     - oc start-build "${APP_NAME}-${CI_COMMIT_BRANCH}" --follow --wait
-    - roxctl
+    - roxctl -e "$ROX_CENTRAL_ADDRESS" image scan --image "${IMAGE_NAME}:${CI_COMMIT_BRANCH}" --insecure-skip-tls-verify --output json > scan.json
+    - jq -r '.results.summary' scan.json
   only:
     - dev
     - test1
