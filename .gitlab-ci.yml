@@ -38,6 +38,7 @@ workflow:
 
 build-image:
   script:
+    - env
     - |
       oc get buildconfig "$BUILD_CONFIG_NAME" &> /dev/null || oc create -f - << EOF
         apiVersion: build.openshift.io/v1
