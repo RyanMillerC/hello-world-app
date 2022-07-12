@@ -1,5 +1,7 @@
 # Hello World (Spring Boot)
 
+This is a test!
+
 ## Deploy using S2I
 
 ```bash
