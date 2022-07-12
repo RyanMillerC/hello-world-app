@@ -19,8 +19,7 @@ variables:
 workflow:
   rules:
     # Test not running pipeline when README is changed
-    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
-      changes:
+    - changes:
         - README.md
       when: never
     - if: $CI_COMMIT_BRANCH == 'dev'
