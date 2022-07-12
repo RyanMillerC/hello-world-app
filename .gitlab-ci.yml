@@ -1,10 +1,19 @@
 default:
+  # TODO: Move this to the GitLab Runner config
   image: quay-registry-quay-quay-enterprise.apps.hub.taco.moe/hello-world/ci-tools:latest
 
+stages:
+  - build-image
+  - scan-image
+
 variables:
+  # Name of the application. This must be unique!
   APP_NAME: hello-world
+
   # IMAGE_NAME should not have a tag at the end! That will be detemined based on branch
   IMAGE_NAME: quay-registry-quay-quay-enterprise.apps.hub.taco.moe/hello-world/hello-world
+
+  # TODO: Move this to the GitLab Runner config
   ROX_CENTRAL_ADDRESS: central-stackrox.apps.hub.taco.moe:443
 
 workflow:
@@ -25,7 +34,7 @@ workflow:
       variables:
         BUILD_CONFIG_NAME: "${APP_NAME}-${CI_COMMIT_SHORT_SHA}"
         IMAGE_TAG: "$CI_COMMIT_SHORT_SHA"
-    - when: always
+    - when: never # Skip running pipeline when none of the "if" statements are true
 
 build-image:
   script:
@@ -60,10 +69,10 @@ build-image:
           successfulBuildsHistoryLimit: 5
       EOF
     - oc start-build "$BUILD_CONFIG_NAME" --follow --wait
+  stage: build-image
+
+scan-image:
+  script:
     - roxctl -e "$ROX_CENTRAL_ADDRESS" image scan --image "${IMAGE_NAME}:${IMAGE_TAG}" --insecure-skip-tls-verify --output json > scan.json
     - jq -r '.result.summary' scan.json
-  only:
-    - dev
-    - test1
-    - test2
-    - main
+  stage: scan-image
