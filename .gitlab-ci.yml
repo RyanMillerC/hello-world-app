@@ -18,10 +18,6 @@ variables:
 
 workflow:
   rules:
-    # Test not running pipeline when README is changed
-    - changes:
-        - README.md
-      when: never
     - if: $CI_COMMIT_BRANCH == 'dev'
       variables:
         BUILD_CONFIG_NAME: "${APP_NAME}-dev"
@@ -42,7 +38,6 @@ workflow:
 
 build-image:
   script:
-    - env
     - |
       oc get buildconfig "$BUILD_CONFIG_NAME" &> /dev/null || oc create -f - << EOF
         apiVersion: build.openshift.io/v1
