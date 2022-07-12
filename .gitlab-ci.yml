@@ -18,6 +18,11 @@ variables:
 
 workflow:
   rules:
+    # Test not running pipeline when README is changed
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+      changes:
+        - README.md
+      when: never
     - if: $CI_COMMIT_BRANCH == 'dev'
       variables:
         BUILD_CONFIG_NAME: "${APP_NAME}-dev"
