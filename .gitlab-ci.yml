@@ -7,6 +7,7 @@ default:
 stages:
   - build-image
   - scan-image
+  - rollout
 
 variables:
   # Name of the application. This must be unique!
@@ -23,16 +24,22 @@ workflow:
     - if: $CI_COMMIT_BRANCH == 'dev'
       variables:
         BUILD_CONFIG_NAME: "${APP_NAME}-dev"
+        DEPLOYMENT_NAME: "${APP_NAME}-dev"
+        DEPLOYMENT_NAMESPACE: "${APP_NAME}-dev"
         IMAGE_TAG: dev
         RUNNER_TAG: dev
     - if: $CI_COMMIT_BRANCH == 'test1'
       variables:
         BUILD_CONFIG_NAME: "${APP_NAME}-test1"
+        DEPLOYMENT_NAME: "${APP_NAME}-test1"
+        DEPLOYMENT_NAMESPACE: "${APP_NAME}-test1"
         IMAGE_TAG: test1
         RUNNER_TAG: stage # I don't have a test cluster so using I'm using stage
     - if: $CI_COMMIT_BRANCH == 'test2'
       variables:
         BUILD_CONFIG_NAME: "${APP_NAME}-test2"
+        DEPLOYMENT_NAME: "${APP_NAME}-test2"
+        DEPLOYMENT_NAMESPACE: "${APP_NAME}-test2"
         IMAGE_TAG: test2
         RUNNER_TAG: stage # I don't have a test cluster so using I'm using stage
     - if: $CI_COMMIT_BRANCH == 'main'
@@ -84,3 +91,8 @@ scan-image:
     - jq -r '.result.summary' scan.json
   stage: scan-image
   allow_failure: true # TODO: Remove this; Current image has fixable vulns
+
+rollout:
+  script:
+    - oc rollout restart "deployment/${DEPLOYMENT_NAME}" -n "$DEPLOYMENT_NAMESPACE"
+  stage: rollout
