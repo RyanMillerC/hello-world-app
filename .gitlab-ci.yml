@@ -1,8 +1,8 @@
 default:
   # TODO: Move this to the GitLab Runner config
   image: quay-registry-quay-quay-enterprise.apps.hub.taco.moe/hello-world/ci-tools:latest
-  # tags:
-  #   - $RUNNER_TAG
+  tags:
+    - $RUNNER_TAG
 
 stages:
   - build-image
