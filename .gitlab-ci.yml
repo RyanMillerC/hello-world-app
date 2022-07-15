@@ -1,6 +1,8 @@
 default:
   # TODO: Move this to the GitLab Runner config
   image: quay-registry-quay-quay-enterprise.apps.hub.taco.moe/hello-world/ci-tools:latest
+  tags:
+    - $RUNNER_TAG
 
 stages:
   - build-image
@@ -22,18 +24,22 @@ workflow:
       variables:
         BUILD_CONFIG_NAME: "${APP_NAME}-dev"
         IMAGE_TAG: dev
+        RUNNER_TAG: dev
     - if: $CI_COMMIT_BRANCH == 'test1'
       variables:
         BUILD_CONFIG_NAME: "${APP_NAME}-test1"
         IMAGE_TAG: test1
+        RUNNER_TAG: stage # I don't have a test cluster so using I'm using stage
     - if: $CI_COMMIT_BRANCH == 'test2'
       variables:
         BUILD_CONFIG_NAME: "${APP_NAME}-test2"
         IMAGE_TAG: test2
+        RUNNER_TAG: stage # I don't have a test cluster so using I'm using stage
     - if: $CI_COMMIT_BRANCH == 'main'
       variables:
         BUILD_CONFIG_NAME: "${APP_NAME}-${CI_COMMIT_SHORT_SHA}"
         IMAGE_TAG: "$CI_COMMIT_SHORT_SHA"
+        RUNNER_TAG: stage # I don't have a test cluster so using I'm using stage
     - when: never # Skip running pipeline when none of the "if" statements are true
 
 build-image:
