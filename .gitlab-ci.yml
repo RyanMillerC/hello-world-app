@@ -1,19 +1,62 @@
 default:
-  image: registry.redhat.io/openshift4/ose-cli:latest
+  # TODO: Move this to the GitLab Runner config
+  image: quay-registry-quay-quay-enterprise.apps.hub.taco.moe/hello-world/ci-tools:latest
+  tags:
+    - $RUNNER_TAG
+
+stages:
+  - build-image
+  - scan-image
+  - rollout
 
 variables:
+  # Name of the application. This must be unique!
   APP_NAME: hello-world
+
   # IMAGE_NAME should not have a tag at the end! That will be detemined based on branch
-  IMAGE_NAME: quay-registry-quay-quay-enterprise.apps.hub.taco.moe/hello-world/hello-world
+  IMAGE_NAME: quay-registry-quay-quay-enterprise.apps.hub.taco.moe/hello-world/middleware/hello-world
+
+  # TODO: Move this to the GitLab Runner config
+  ROX_CENTRAL_ADDRESS: central-stackrox.apps.hub.taco.moe:443
+
+workflow:
+  rules:
+    - if: $CI_COMMIT_BRANCH == 'dev'
+      variables:
+        BUILD_CONFIG_NAME: "${APP_NAME}-dev"
+        DEPLOYMENT_NAME: "${APP_NAME}-dev"
+        DEPLOYMENT_NAMESPACE: "${APP_NAME}-dev"
+        IMAGE_TAG: dev
+        RUNNER_TAG: dev
+    - if: $CI_COMMIT_BRANCH == 'test1'
+      variables:
+        BUILD_CONFIG_NAME: "${APP_NAME}-test1"
+        DEPLOYMENT_NAME: "${APP_NAME}-test1"
+        DEPLOYMENT_NAMESPACE: "${APP_NAME}-test1"
+        IMAGE_TAG: test1
+        RUNNER_TAG: dev # I don't have a test cluster so using I'm using stage
+    - if: $CI_COMMIT_BRANCH == 'test2'
+      variables:
+        BUILD_CONFIG_NAME: "${APP_NAME}-test2"
+        DEPLOYMENT_NAME: "${APP_NAME}-test2"
+        DEPLOYMENT_NAMESPACE: "${APP_NAME}-test2"
+        IMAGE_TAG: test2
+        RUNNER_TAG: stage # I don't have a test cluster so using I'm using stage
+    - if: $CI_COMMIT_BRANCH == 'main'
+      variables:
+        BUILD_CONFIG_NAME: "${APP_NAME}-${CI_COMMIT_SHORT_SHA}"
+        IMAGE_TAG: "$CI_COMMIT_SHORT_SHA"
+        RUNNER_TAG: stage # I don't have a test cluster so using I'm using stage
+    - when: never # Skip running pipeline when none of the "if" statements are true
 
 build-image:
   script:
     - |
-      oc get buildconfig $CI_COMMIT_BRANCH &> /dev/null || oc create -f - << EOF
+      oc get buildconfig "$BUILD_CONFIG_NAME" &> /dev/null || oc create -f - << EOF
         apiVersion: build.openshift.io/v1
         kind: BuildConfig
         metadata:
-          name: "${APP_NAME}-${CI_COMMIT_BRANCH}"
+          name: "$BUILD_CONFIG_NAME"
           namespace: gitlab-runner
         spec:
           failedBuildsHistoryLimit: 5
@@ -22,7 +65,7 @@ build-image:
               name: push-secret # This needs to be created
             to:
               kind: DockerImage
-              name: "${IMAGE_NAME}:${CI_COMMIT_BRANCH}"
+              name: "${IMAGE_NAME}:${IMAGE_TAG}"
           runPolicy: Serial
           source:
             git:
@@ -38,44 +81,18 @@ build-image:
             type: Source
           successfulBuildsHistoryLimit: 5
       EOF
-    - oc start-build "${APP_NAME}-${CI_COMMIT_BRANCH}" --follow --wait
-  only:
-    - dev
-    - test1
-    - test2
+    - oc start-build "$BUILD_CONFIG_NAME" --follow --wait
+  stage: build-image
 
-build-release-image:
+scan-image:
   script:
-    - |
-      oc get buildconfig "${APP_NAME}-${CI_COMMIT_SHORT_SHA}" &> /dev/null || oc create -f - << EOF
-        apiVersion: build.openshift.io/v1
-        kind: BuildConfig
-        metadata:
-          name: "${APP_NAME}-${CI_COMMIT_SHORT_SHA}"
-          namespace: gitlab-runner
-        spec:
-          failedBuildsHistoryLimit: 5
-          output:
-            pushSecret:
-              name: push-secret # This needs to be created
-            to:
-              kind: DockerImage
-              name: "${IMAGE_NAME}:${CI_COMMIT_SHORT_SHA}"
-          runPolicy: Serial
-          source:
-            git:
-              ref: $CI_COMMIT_BRANCH
-              uri: "${CI_PROJECT_URL}.git"
-            type: Git
-          strategy:
-            sourceStrategy:
-              from:
-                kind: ImageStreamTag
-                name: java:openjdk-17-ubi8
-                namespace: openshift
-            type: Source
-          successfulBuildsHistoryLimit: 5
-      EOF
-    - oc start-build "${APP_NAME}-${CI_COMMIT_SHORT_SHA}" --follow --wait
-  only:
-    - main
+    - roxctl -e "$ROX_CENTRAL_ADDRESS" image check --image "${IMAGE_NAME}:${IMAGE_TAG}" --insecure-skip-tls-verify --output json
+    - roxctl -e "$ROX_CENTRAL_ADDRESS" image scan --image "${IMAGE_NAME}:${IMAGE_TAG}" --insecure-skip-tls-verify --output json > scan.json
+    - jq -r '.result.summary' scan.json
+  stage: scan-image
+  allow_failure: true # TODO: Remove this; Current image has fixable vulns
+
+rollout:
+  script:
+    - oc rollout restart "deployment/${DEPLOYMENT_NAME}" -n "$DEPLOYMENT_NAMESPACE"
+  stage: rollout
