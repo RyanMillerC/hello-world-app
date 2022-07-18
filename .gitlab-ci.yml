@@ -34,7 +34,7 @@ workflow:
         DEPLOYMENT_NAME: "${APP_NAME}-test1"
         DEPLOYMENT_NAMESPACE: "${APP_NAME}-test1"
         IMAGE_TAG: test1
-        RUNNER_TAG: stage # I don't have a test cluster so using I'm using stage
+        RUNNER_TAG: dev # I don't have a test cluster so using I'm using stage
     - if: $CI_COMMIT_BRANCH == 'test2'
       variables:
         BUILD_CONFIG_NAME: "${APP_NAME}-test2"
