@@ -53,8 +53,7 @@ workflow:
 
 build-image:
   script:
-    - |
-      oc get buildconfig "$BUILD_CONFIG_NAME" &> /dev/null || oc create -f - << EOF
+    - oc apply -f - << EOF
         apiVersion: build.openshift.io/v1
         kind: BuildConfig
         metadata:
