@@ -53,7 +53,7 @@ workflow:
 
 build-image:
   script:
-    -|
+    - |
       oc apply -f - << EOF
         apiVersion: build.openshift.io/v1
         kind: BuildConfig
