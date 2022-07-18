@@ -14,7 +14,7 @@ variables:
   APP_NAME: hello-world
 
   # IMAGE_NAME should not have a tag at the end! That will be detemined based on branch
-  IMAGE_NAME: quay-registry-quay-quay-enterprise.apps.hub.taco.moe/hello-world/middleware/hello-world
+  IMAGE_NAME: quay-registry-quay-quay-enterprise.apps.hub.taco.moe/hello-world/hello-world
 
   # TODO: Move this to the GitLab Runner config
   ROX_CENTRAL_ADDRESS: central-stackrox.apps.hub.taco.moe:443
