@@ -19,6 +19,8 @@ variables:
   # TODO: Move this to the GitLab Runner config
   ROX_CENTRAL_ADDRESS: central-stackrox.apps.hub.taco.moe:443
 
+# NOTE: I don't have a test cluster so I'm deploying dev/test1 to dev cluster
+# and test2/stage to stage cluster.
 workflow:
   rules:
     - if: $CI_COMMIT_BRANCH == 'dev'
@@ -34,19 +36,19 @@ workflow:
         DEPLOYMENT_NAME: "${APP_NAME}-test1"
         DEPLOYMENT_NAMESPACE: "${APP_NAME}-test1"
         IMAGE_TAG: test1
-        RUNNER_TAG: dev # I don't have a test cluster so using I'm using stage
+        RUNNER_TAG: dev
     - if: $CI_COMMIT_BRANCH == 'test2'
       variables:
         BUILD_CONFIG_NAME: "${APP_NAME}-test2"
         DEPLOYMENT_NAME: "${APP_NAME}-test2"
         DEPLOYMENT_NAMESPACE: "${APP_NAME}-test2"
         IMAGE_TAG: test2
-        RUNNER_TAG: stage # I don't have a test cluster so using I'm using stage
+        RUNNER_TAG: stage
     - if: $CI_COMMIT_BRANCH == 'main'
       variables:
         BUILD_CONFIG_NAME: "${APP_NAME}-${CI_COMMIT_SHORT_SHA}"
         IMAGE_TAG: "$CI_COMMIT_SHORT_SHA"
-        RUNNER_TAG: stage # I don't have a test cluster so using I'm using stage
+        RUNNER_TAG: stage
     - when: never # Skip running pipeline when none of the "if" statements are true
 
 build-image:
