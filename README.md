@@ -1,15 +1,8 @@
-# Hello World (Spring Boot)
+# Hello World App
 
-This is a test!
+Code to build the hello-world Java (Spring Boot) application container image.
+This is an example "Hello World" application that prints a message. It should
+be built into a container image and pushed to a container registry.
 
-## Deploy using S2I
-
-```bash
-$ oc new-project hello-world
-$ oc new-app java~https://git.taco.moe/lab/hello-world-spring-boot.git
-$ watch -d oc get builds
-# Wait for build to complete
-$ oc expose svc/hello-world
-$ oc get routes
-# curl the exposed route
-```
+This application is deployed via Argo CD using the
+[deployment Helm chart](https://github.com/hello-world-gitops/hello-world-deploy.git).
